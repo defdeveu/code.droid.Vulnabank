@@ -3,6 +3,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <permission android:name="defdev.labs.droid.vulnabank.transactions.READ_WRITE" />
+
     <application
         android:name=".VulnaBankApplication"
         android:allowBackup="true"
@@ -28,6 +30,12 @@
             android:name=".MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize" />
+
+        <provider
+            android:name=".data.TransactionsProvider"
+            android:authorities="defdev.labs.droid.vulnabank.transactions"
+            android:exported="true"
+            android:permission="defdev.labs.droid.vulnabank.transactions.READ_WRITE" />
     </application>
 
 </manifest>

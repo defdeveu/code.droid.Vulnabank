@@ -7,16 +7,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import defdev.labs.droid.vulnabank.theme.VulnaBankTheme
-import defdev.labs.droid.vulnabank.ui.ContentColumn
-import defdev.labs.droid.vulnabank.ui.LabHeader
-import defdev.labs.droid.vulnabank.ui.PrimaryAction
+import defdev.labs.droid.vulnabank.ui.LoginScreen
 
 class LoginActivity : ComponentActivity() {
+    private val container: AppContainer
+        get() = (application as VulnaBankApplication).container
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
@@ -25,15 +23,14 @@ class LoginActivity : ComponentActivity() {
         )
         setContent {
             VulnaBankTheme {
-                Scaffold(topBar = { LabHeader() }) { insets ->
-                    ContentColumn(Modifier.padding(insets)) {
-                        PrimaryAction(stringResource(R.string.login), enabled = true) {
-                            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                            finish()
-                        }
-                    }
-                }
+                val model: LoginViewModel = viewModel(factory = container.viewModelFactory)
+                LoginScreen(model) { showMain() }
             }
         }
+    }
+
+    private fun showMain() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 }
