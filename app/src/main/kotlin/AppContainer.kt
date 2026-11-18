@@ -9,6 +9,11 @@ import defdev.labs.droid.vulnabank.service.AuthRepository
 import defdev.labs.droid.vulnabank.service.CryptoService
 import defdev.labs.droid.vulnabank.service.DefaultAuthRepository
 import defdev.labs.droid.vulnabank.service.DefaultCryptoService
+import defdev.labs.droid.vulnabank.service.DefaultTransactionRepository
+import defdev.labs.droid.vulnabank.service.HttpTransactionService
+import defdev.labs.droid.vulnabank.service.TransactionRepository
+import defdev.labs.droid.vulnabank.service.TransactionService
+import kotlinx.coroutines.Dispatchers
 
 class AppContainer(context: Context) {
     private val applicationContext: Context = context.applicationContext
@@ -25,6 +30,19 @@ class AppContainer(context: Context) {
     )
 
     val database: TransactionsDatabase by lazy { TransactionsDatabase.create(applicationContext) }
+
+    val transactionService: TransactionService by lazy {
+        HttpTransactionService(authRepository.getServerAddress())
+    }
+
+    val transactionRepository: TransactionRepository by lazy {
+        DefaultTransactionRepository(
+            dao = database.transactionsDao(),
+            cryptoService = cryptoService,
+            transactionService = transactionService,
+            ioDispatcher = Dispatchers.IO,
+        )
+    }
 
     val viewModelFactory: ViewModelProvider.Factory = viewModelFactory {
         initializer { LoginViewModel(authRepository) }
