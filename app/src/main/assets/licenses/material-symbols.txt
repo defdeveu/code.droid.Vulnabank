@@ -1,0 +1,4 @@
+Material Symbols Rounded: payments, movie_info, settings, menu, menu_open, add, delete.
+Sources:
+https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/<name>/default/24px.svg
+License: material-symbols.LICENSE.txt

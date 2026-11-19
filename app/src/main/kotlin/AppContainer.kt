@@ -14,9 +14,15 @@ import defdev.labs.droid.vulnabank.service.HttpTransactionService
 import defdev.labs.droid.vulnabank.service.TransactionRepository
 import defdev.labs.droid.vulnabank.service.TransactionService
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 class AppContainer(context: Context) {
     private val applicationContext: Context = context.applicationContext
+
+    val serverUrlSsl: String = BuildConfig.LAB_ENDPOINT
+    val serverUrl: String = BuildConfig.LAB_ENDPOINT.replaceFirst("https://", "http://")
 
     val cryptoService: CryptoService = DefaultCryptoService(applicationContext)
 
@@ -26,7 +32,7 @@ class AppContainer(context: Context) {
             Context.MODE_PRIVATE,
         ),
         cryptoService = cryptoService,
-        defaultServerAddress = BuildConfig.LAB_ENDPOINT,
+        defaultServerAddress = serverUrlSsl,
     )
 
     val database: TransactionsDatabase by lazy { TransactionsDatabase.create(applicationContext) }
@@ -44,7 +50,16 @@ class AppContainer(context: Context) {
         )
     }
 
+    private val foreground = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val appInForeground: SharedFlow<Unit> = foreground.asSharedFlow()
+
+    fun onAppInForeground() {
+        foreground.tryEmit(Unit)
+    }
+
     val viewModelFactory: ViewModelProvider.Factory = viewModelFactory {
         initializer { LoginViewModel(authRepository) }
+        initializer { TransactionsViewModel(transactionRepository, applicationContext::getString) }
+        initializer { SettingsViewModel(authRepository, serverUrl, serverUrlSsl) }
     }
 }
